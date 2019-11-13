@@ -117,7 +117,7 @@ public:
        }
     }
 
-    friend std::ostream& operator <<(std::ostream& os, Matrix<T>& p) {
+    friend std::ostream& operator <<(std::ostream& os, const Matrix<T>& p) {
         if(!p.root->down) {
             os << "No hay valores en la matriz.\n";
             return os;
@@ -159,7 +159,7 @@ public:
         return os;
     }
 
-    std::pair<int,int> get_dimensiones() {
+    std::pair<int,int> get_dimensiones() const {
         IndexNodeR<T>* a = root->down;
         IndexNodeC<T>* b = root->next;
         int row = 0;
@@ -183,55 +183,6 @@ public:
             dimensiones.second = col;
             return dimensiones;
         }
-    }
-
-    /*void print_matrix() {
-        IndexNodeR<T>* r = root->down;
-        IndexNodeC<T>* c = root->next;
-        ValNode<T>* data = r->next;
-        int indexc = 0;
-        int indexr = 0;
-        while(r) {
-            indexr = r->indice;
-            r = r->down;
-        }
-        while(c) {
-            indexc = c->indice;
-            c = c->next;
-        }
-        r = root->down;
-        c = root->next;
-        for(int i = 0; i < indexr+1; i++) {
-            for(int j = 0; j < indexc+1; j++) {
-                if(r->indice != i) {
-                    std::cout << "0" << " ";
-                }
-                else {
-                    if(data) {
-                        if(data->x != j) {
-                            std::cout << "0" << " ";
-                        }
-                        else if (data->x == j) {
-                            std::cout << data->value << " ";
-                            data = data->next;
-                        }
-                    } else {
-                        std::cout << "0 ";
-                    }
-                }
-            }
-            if(r->indice == i) {
-                r = r->down;
-                if(!r)
-                    break;
-                data = r->next;
-            }
-            std::cout << std::endl;
-        }
-    }*/
-
-    std::ostream& operator<<(std::ofstream& jj) {
-
     }
 
     void operator = (Matrix<T> F) {
@@ -334,6 +285,135 @@ public:
         }
         else {
             std::cout << "Estas matrices no se pueden sumar.\n";
+        }
+    }
+
+    static Matrix<T> indentity(int a) {
+            Matrix<T> P;
+            for(int i = 0; i < a; i++) {
+                P << std::make_tuple(i,i,1);
+            }
+            return P;
+    }
+
+    Matrix<T> transpuesta() {
+        Matrix<T> J;
+        IndexNodeR<T>* R = root->down;
+        ValNode<T>* val = R->next;
+        while(R) {
+            while(val) {
+                J << std::make_tuple(val->x,val->y, val->value);
+                val = val->next;
+            }
+            R = R->down;
+            if(R) {
+                val = R->next;
+            }
+        }
+        return J;
+    }
+
+    void erase(int col, int row) {
+        IndexNodeR<T>** r = &root->down;
+        IndexNodeC<T>** c = &root->next;
+        int caso_columna = 0;
+        int caso_fila = 0;
+        while((*r)) {
+            if((*r)->indice == row) {
+                break;
+            }
+            r = &(*r)->down;
+        }
+        while((*c)) {
+            if((*c)->indice == col) {
+                break;
+            }
+            c = &(*c)->next;
+        }
+        if(!(*r) || !(*c)) {
+            std::cout << "No se encontro el valor.\n";
+            return;
+        }
+        else {
+            ValNode<T>** val1 = &(*r)->next;
+            ValNode<T>** val2 = &(*c)->down;
+            while((*val1)) {
+                if((*val1)->x == col) {
+                    /*ValNode<T>* temp = (*val1)->next;
+                    delete (*val1);
+                    (*val1) = temp;*/
+                    caso_fila = 1;
+                    break;
+                }
+                else if((*val1)->next) {
+                    if((*val1)->next->x == col) {
+                        /*ValNode<T>* temp = (*val1)->next->next;
+                        delete (*val1);
+                        (*val1) = temp;*/
+                        caso_fila = 2;
+                        break;
+                    }
+                }
+                val1 = &(*val1)->next;
+            }
+            while((*val2)) {
+                if((*val2)->y == row) {
+                    caso_columna = 1;
+                    break;
+                }
+                else if((*val2)->down) {
+                    if((*val2)->down->y == row) {
+                        caso_columna = 2;
+                        break;
+                    }
+                }
+                val2 = &(*val2)->down;
+            }
+
+            if((*val2) && (*val1)) {
+                if(caso_fila == 1 && caso_columna == 1) {
+                    ValNode<T>* temp = (*val1)->next;
+                    delete (*val1);
+                    (*val1) = temp;
+
+                    ValNode<T>* temp2 = (*val2)->down;
+                    delete (*val2);
+                    (*val2) = temp;
+                }
+                else if(caso_fila == 2 && caso_columna == 2) {
+                    ValNode<T>* temp = (*val1)->next->next;
+                    delete (*val1);
+                    (*val1) = temp;
+
+                    ValNode<T>* temp2 = (*val2)->down->down;
+                    delete (*val2);
+                    (*val2) = temp;
+                }
+                else if(caso_fila == 2 && caso_columna == 1) {
+                    ValNode<T>* temp = (*val1)->next->next;
+                    delete (*val1);
+                    (*val1) = temp;
+
+                    ValNode<T>* temp2 = (*val2)->down;
+                    delete (*val2);
+                    (*val2) = temp;
+                }
+                else if(caso_fila == 1 && caso_columna == 2) {
+                    ValNode<T> *temp = (*val1)->next;
+                    delete (*val1);
+                    (*val1) = temp;
+
+                    ValNode<T>* temp2 = (*val2)->down->down;
+                    delete (*val2);
+                    (*val2) = temp;
+                }
+                return;
+            }
+            else {
+                std::cout << "No se encontro el valor.\n";
+                return;
+            }
+
         }
     }
 };
