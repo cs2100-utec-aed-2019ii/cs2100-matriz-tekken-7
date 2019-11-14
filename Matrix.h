@@ -330,6 +330,7 @@ public:
             }
             c = &(*c)->next;
         }
+        std::cout << "Indices encontrados : " << (*r)->indice << " " << (*c)->indice << std::endl;
         if(!(*r) || !(*c)) {
             std::cout << "No se encontro el valor.\n";
             return;
@@ -339,17 +340,11 @@ public:
             ValNode<T>** val2 = &(*c)->down;
             while((*val1)) {
                 if((*val1)->x == col) {
-                    /*ValNode<T>* temp = (*val1)->next;
-                    delete (*val1);
-                    (*val1) = temp;*/
                     caso_fila = 1;
                     break;
                 }
                 else if((*val1)->next) {
                     if((*val1)->next->x == col) {
-                        /*ValNode<T>* temp = (*val1)->next->next;
-                        delete (*val1);
-                        (*val1) = temp;*/
                         caso_fila = 2;
                         break;
                     }
@@ -371,6 +366,8 @@ public:
             }
 
             if((*val2) && (*val1)) {
+                std::cout << "Valores que se encontraron para borrar.\n";
+                std::cout << (*val1)->value << " " << (*val2)->value << std::endl;
                 if(caso_fila == 1 && caso_columna == 1) {
                     ValNode<T>* temp = (*val1)->next;
                     delete (*val1);
@@ -382,30 +379,39 @@ public:
                 }
                 else if(caso_fila == 2 && caso_columna == 2) {
                     ValNode<T>* temp = (*val1)->next->next;
-                    delete (*val1);
-                    (*val1) = temp;
+                    delete (*val1)->next;
+                    (*val1)->next = temp;
 
                     ValNode<T>* temp2 = (*val2)->down->down;
-                    delete (*val2);
-                    (*val2) = temp;
+                    delete (*val2)->down;
+                    (*val2)->down = temp;
                 }
                 else if(caso_fila == 2 && caso_columna == 1) {
                     ValNode<T>* temp = (*val1)->next->next;
-                    delete (*val1);
-                    (*val1) = temp;
+                    delete (*val1)->next;
+                    (*val1)->next = temp;
 
                     ValNode<T>* temp2 = (*val2)->down;
                     delete (*val2);
                     (*val2) = temp;
                 }
                 else if(caso_fila == 1 && caso_columna == 2) {
-                    ValNode<T> *temp = (*val1)->next;
-                    delete (*val1);
-                    (*val1) = temp;
+                    ValNode<T>* temp = (*val1)->next->next;
+                    delete (*val1)->next;
+                    (*val1)->next = temp;
 
                     ValNode<T>* temp2 = (*val2)->down->down;
-                    delete (*val2);
-                    (*val2) = temp;
+                    delete (*val2)->down;
+                    (*val2)->down = temp;
+                }
+
+                if(!(*r)->next) {
+                    delete (*r);
+                    (*r) = nullptr;
+                }
+                if(!(*c)->down) {
+                    delete (*c);
+                    (*c) = nullptr;
                 }
                 return;
             }
@@ -415,6 +421,10 @@ public:
             }
 
         }
+    }
+
+    Matrix<T> operator*(Matrix<T> F){
+
     }
 };
 #endif
