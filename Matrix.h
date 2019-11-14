@@ -330,7 +330,6 @@ public:
             }
             c = &(*c)->next;
         }
-        std::cout << "Indices encontrados : " << (*r)->indice << " " << (*c)->indice << std::endl;
         if(!(*r) || !(*c)) {
             std::cout << "No se encontro el valor.\n";
             return;
@@ -366,8 +365,6 @@ public:
             }
 
             if((*val2) && (*val1)) {
-                std::cout << "Valores que se encontraron para borrar.\n";
-                std::cout << (*val1)->value << " " << (*val2)->value << std::endl;
                 if(caso_fila == 1 && caso_columna == 1) {
                     ValNode<T>* temp = (*val1)->next;
                     delete (*val1);
